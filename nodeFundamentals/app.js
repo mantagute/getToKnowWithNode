@@ -1,16 +1,28 @@
-const EventEmitter = require('events');
+// const {createReadStream} = require('fs');
 
-const customEmitter = new EventEmitter();
+// const stream = createReadStream('./content/big.txt', {highWaterMark: 90000, encoding: 'utf8'});
 
-customEmitter.on('response', (name,id) => {
-    console.log(`data recieved. User: ${name}, with id ${id}`)
-})
+// stream.on('data', (result) => {
+//     console.log(result)
+// })
 
-customEmitter.on('response', () => {
-    console.log(`some other logic here`)
-})
+// stream.on('error', (error) => console.log(error))
 
-customEmitter.emit('response', 'john', 18)
+var http = require('http');
+var fs = require('fs');
+const { error } = require('console');
+
+http.createServer(function (req, res) {
+    // const text = fs.readFileSync('./content/big.txt', 'utf8');
+    // res.end(text)
+    const fileStream = fs.createReadStream('./content/big.txt', 'utf8')
+    fileStream.on('open', () => {
+        fileStream.pipe(res)
+    })
+    fileStream.on('error',(error) => {
+        res.end(error)
+    })
+}).listen(8000)
 
 
 
