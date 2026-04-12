@@ -10,7 +10,7 @@ const getAllProductsStatic = async (request, response) => {
 }
 
 const getAllProducts = async (request, response) => {
-    const {featured, company, name, sort} = request.query; 
+    const {featured, company, name, sort, fields} = request.query; 
     
     queryObject = {};
 
@@ -35,6 +35,17 @@ const getAllProducts = async (request, response) => {
     else {
         result = result.sort('createdAt');
     }
+
+    if (fields) {
+        const fieldsList = fields.split(',').join(' ');
+        result = result.select(fieldsList);
+    }
+
+    const page = Number(request.query.page) || 1;
+    const limit = Number(request.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    result = result.skip(skip).limit(limit);
 
     const products = await result;
 
