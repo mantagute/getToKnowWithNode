@@ -10,7 +10,7 @@ const getAllProductsStatic = async (request, response) => {
 }
 
 const getAllProducts = async (request, response) => {
-    const {featured, company, name } = request.query; 
+    const {featured, company, name, sort} = request.query; 
     
     queryObject = {};
 
@@ -26,9 +26,18 @@ const getAllProducts = async (request, response) => {
         queryObject.name = { $regex: name, $options: 'i'};
     }
 
-    console.log(queryObject);
+    let result = Product.find(queryObject);
 
-    const products = await Product.find(queryObject);
+    if (sort) {
+        const sortList = sort.split(',').join(' ');
+        result = result.sort(sortList);
+    }
+    else {
+        result = result.sort('createdAt');
+    }
+
+    const products = await result;
+
     response.status(200).json({products, nbHits: products.length});
 }
 
